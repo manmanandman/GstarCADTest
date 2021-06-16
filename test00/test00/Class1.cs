@@ -405,7 +405,7 @@ namespace test00
                             }
                             catch
                             {
-                                acDoc.Editor.WriteMessage("None\n");
+                                
                             }
 
                             //// Get the values in the xdata
