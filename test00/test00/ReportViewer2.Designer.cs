@@ -1,6 +1,6 @@
 ﻿namespace test00
 {
-    partial class ReportViewer
+    partial class ReportViewer2
     {
         /// <summary>
         /// Required designer variable.
@@ -29,9 +29,7 @@
         private void InitializeComponent()
         {
             this.crystalReportViewer1 = new CrystalDecisions.Windows.Forms.CrystalReportViewer();
-            this.CrystalReport11 = new test00.CrystalReport1();
             this.CrystalReport21 = new test00.CrystalReport2();
-            this.CrystalReport12 = new test00.CrystalReport1();
             this.SuspendLayout();
             // 
             // crystalReportViewer1
@@ -42,18 +40,18 @@
             this.crystalReportViewer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.crystalReportViewer1.Location = new System.Drawing.Point(0, 0);
             this.crystalReportViewer1.Name = "crystalReportViewer1";
-            this.crystalReportViewer1.ReportSource = this.CrystalReport11;
-            this.crystalReportViewer1.Size = new System.Drawing.Size(1114, 616);
+            this.crystalReportViewer1.ReportSource = this.CrystalReport21;
+            this.crystalReportViewer1.Size = new System.Drawing.Size(995, 594);
             this.crystalReportViewer1.TabIndex = 0;
             // 
-            // ReportViewer
+            // ReportViewer2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1114, 616);
+            this.ClientSize = new System.Drawing.Size(995, 594);
             this.Controls.Add(this.crystalReportViewer1);
-            this.Name = "ReportViewer";
-            this.Text = "ReportViewer";
+            this.Name = "ReportViewer2";
+            this.Text = "ReportViewer2";
             this.ResumeLayout(false);
 
         }
@@ -61,8 +59,6 @@
         #endregion
 
         private CrystalDecisions.Windows.Forms.CrystalReportViewer crystalReportViewer1;
-        private CrystalReport1 CrystalReport11;
         private CrystalReport2 CrystalReport21;
-        private CrystalReport1 CrystalReport12;
     }
 }

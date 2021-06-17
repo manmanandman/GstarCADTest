@@ -38,6 +38,7 @@
             this.crystalReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportToPDFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Result = new System.Windows.Forms.DataGridView();
+            this.exportTotalTendonToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Result)).BeginInit();
             this.SuspendLayout();
@@ -65,7 +66,7 @@
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(93, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             // 
             // databaseToolStripMenuItem
@@ -103,7 +104,8 @@
             // crystalReportToolStripMenuItem
             // 
             this.crystalReportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportToPDFToolStripMenuItem});
+            this.exportToPDFToolStripMenuItem,
+            this.exportTotalTendonToolStripMenuItem});
             this.crystalReportToolStripMenuItem.Name = "crystalReportToolStripMenuItem";
             this.crystalReportToolStripMenuItem.Size = new System.Drawing.Size(93, 20);
             this.crystalReportToolStripMenuItem.Text = "Crystal Report";
@@ -111,8 +113,8 @@
             // exportToPDFToolStripMenuItem
             // 
             this.exportToPDFToolStripMenuItem.Name = "exportToPDFToolStripMenuItem";
-            this.exportToPDFToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
-            this.exportToPDFToolStripMenuItem.Text = "Export to PDF";
+            this.exportToPDFToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.exportToPDFToolStripMenuItem.Text = "Export Report Tendon";
             this.exportToPDFToolStripMenuItem.Click += new System.EventHandler(this.exportToPDFToolStripMenuItem_Click);
             // 
             // Result
@@ -124,6 +126,13 @@
             this.Result.Size = new System.Drawing.Size(800, 426);
             this.Result.TabIndex = 1;
             this.Result.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.Result_CellContentClick);
+            // 
+            // exportTotalTendonToolStripMenuItem
+            // 
+            this.exportTotalTendonToolStripMenuItem.Name = "exportTotalTendonToolStripMenuItem";
+            this.exportTotalTendonToolStripMenuItem.Size = new System.Drawing.Size(188, 22);
+            this.exportTotalTendonToolStripMenuItem.Text = "Export Total Tendon";
+            this.exportTotalTendonToolStripMenuItem.Click += new System.EventHandler(this.exportTotalTendonToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -156,5 +165,6 @@
         private System.Windows.Forms.ToolStripMenuItem exportToPDFToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem clearDataInDatabaseToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem refreshDatabseToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportTotalTendonToolStripMenuItem;
     }
 }

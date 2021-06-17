@@ -272,11 +272,141 @@ namespace test00
 
                     if(tendon3num!=0 && tendon4num!=0)
                     {
-                        form();
+                        Form1 f = new Form1();
+                        f.Show();
+                        f.GetReport();
                     }
                     else
                     {
                         Application.ShowAlertDialog("No tendon level 3 or 4 found.");
+                    }
+                }
+
+                // Ends the transaction and ensures any changes made are ignored
+                acTrans.Abort();
+
+                // Dispose of the transaction
+            }
+        }
+
+        [CommandMethod("GetTendonResult")]
+        public void GetTendonResult()
+        {
+            int tendon1num = 0;
+            int tendon2num = 0;
+            int tendon3num = 0;
+            int tendon4num = 0;
+            int elsenum = 0;
+
+            // Get the current database and start a transaction
+            Database acCurDb;
+            acCurDb = Application.DocumentManager.MdiActiveDocument.Database;
+
+            Document acDoc = Application.DocumentManager.MdiActiveDocument;
+            Editor edt = acDoc.Editor;
+
+            // Prompt the user using PromptStringOptions
+            PromptStringOptions prompt = new PromptStringOptions("Enter AppName : ");
+            prompt.AllowSpaces = true;
+
+            // Get the results of the user input using a PromptResult
+            PromptResult promptResult = edt.GetString(prompt);
+
+            //string appName = "AutoPost2004";
+            string appName = promptResult.StringResult;
+            //string appName = "AutoPost2004";
+
+            string msgstr = "";
+
+            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+            {
+                // Request objects to be selected in the drawing area
+                PromptSelectionResult acSSPrompt = acDoc.Editor.GetSelection();
+
+                // If the prompt status is OK, objects were selected
+                if (acSSPrompt.Status == PromptStatus.OK)
+                {
+                    SelectionSet acSSet = acSSPrompt.Value;
+
+
+                    // Start connect to db
+                    ConnectDatabase();
+                    ClearDB();
+
+                    // Step through the objects in the selection set
+                    foreach (SelectedObject acSSObj in acSSet)
+                    {
+                        // Open the selected object for read
+                        Entity acEnt = acTrans.GetObject(acSSObj.ObjectId,
+                                                         OpenMode.ForRead) as Entity;
+
+                        // Get the extended data attached to each object for MY_APP
+                        ResultBuffer rb = acEnt.GetXDataForApplication(appName);
+
+                        // Make sure the Xdata is not empty
+                        if (rb != null)
+                        {
+                            TypedValue[] tv = rb.AsArray();
+                            var tendon = 0;
+                            var tendonSubId = 0;
+
+                            if (tv[1].TypeCode == 1070 && (tv[1].Value.ToString() == "206" || tv[1].Value.ToString() == "11"))
+                            {
+                                tendon = 1;
+                                tendon1num++;
+                                tendonSubId = tendon1num;
+                            }
+                            else if (tv[1].TypeCode == 1070 && (tv[1].Value.ToString() == "102" || tv[1].Value.ToString() == "12"))
+                            {
+                                tendon = 2;
+                                tendon2num++;
+                                tendonSubId = tendon2num;
+                            }
+                            else if (tv[1].TypeCode == 1070 && (tv[1].Value.ToString() == "103" || tv[1].Value.ToString() == "13"))
+                            {
+                                tendon = 3;
+                                tendon3num++;
+                                tendonSubId = tendon3num;
+                            }
+                            else if (tv[1].TypeCode == 1070 && (tv[1].Value.ToString() == "104" || tv[1].Value.ToString() == "14"))
+                            {
+                                tendon = 4;
+                                tendon4num++;
+                                tendonSubId = tendon4num;
+                            }
+                            else
+                            {
+                                tendon = 0;
+                                elsenum++;
+                                tendonSubId = elsenum;
+                            }
+
+                            // Get the values in the xdata
+                            foreach (TypedValue typeVal in rb)
+                            {
+                                msgstr = msgstr + "\n" + typeVal.TypeCode.ToString() + " : " + typeVal.Value;
+                                AddDataToDatabase(tendon, tendonSubId, typeVal.TypeCode.ToString(), typeVal.Value.ToString());
+                            }
+                        }
+                        else
+                        {
+                            msgstr = "NONE";
+                        }
+
+                        // Display the values returned
+                        //Application.ShowAlertDialog(appName + " xdata on " + acEnt.GetType().ToString() + ":\n" + msgstr);
+
+
+                        msgstr = "";
+                    }
+
+                    CloseDatabase();
+
+                    if (tendon3num != 0 && tendon4num != 0)
+                    {
+                        Form1 f = new Form1();
+                        f.Show();
+                        f.GetTotalTendon();
                     }
                 }
 

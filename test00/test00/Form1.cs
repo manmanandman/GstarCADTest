@@ -137,5 +137,23 @@ namespace test00
         {
 
         }
+
+        private void exportTotalTendonToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ReportViewer2 report2 = new ReportViewer2();
+            report2.Show();
+        }
+
+        public void GetReport()
+        {
+            exportToPDFToolStripMenuItem.Enabled = true;
+            exportTotalTendonToolStripMenuItem.Enabled = false;
+        }
+
+        public void GetTotalTendon()
+        {
+            exportToPDFToolStripMenuItem.Enabled = false;
+            exportTotalTendonToolStripMenuItem.Enabled = true;
+        }
     }
 }
