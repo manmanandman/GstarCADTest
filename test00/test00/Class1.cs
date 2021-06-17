@@ -19,6 +19,8 @@ namespace test00
 {
     public class HelloCmd 
     {
+        public static String conn_string = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\\KMUTT\\GstarCADTest\\XdataTest.accdb;Persist Security Info= False";
+
         [CommandMethod("DrawSquare")]
         public void DrawSquare()
         {
@@ -92,6 +94,76 @@ namespace test00
             }
         }
 
+        [CommandMethod("ViewXData")]
+        public void ViewXData()
+        {
+            // Get the current database and start a transaction
+            Database acCurDb;
+            acCurDb = Application.DocumentManager.MdiActiveDocument.Database;
+
+            Document acDoc = Application.DocumentManager.MdiActiveDocument;
+            Editor edt = acDoc.Editor;
+
+            // Prompt the user using PromptStringOptions
+            PromptStringOptions prompt = new PromptStringOptions("Enter AppName : ");
+            prompt.AllowSpaces = true;
+
+            // Get the results of the user input using a PromptResult
+            PromptResult promptResult = edt.GetString(prompt);
+
+            //string appName = "AutoPost2004";
+            string appName = promptResult.StringResult;
+
+            string msgstr = "";
+
+            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+            {
+                // Request objects to be selected in the drawing area
+                PromptSelectionResult acSSPrompt = acDoc.Editor.GetSelection();
+
+                // If the prompt status is OK, objects were selected
+                if (acSSPrompt.Status == PromptStatus.OK)
+                {
+                    SelectionSet acSSet = acSSPrompt.Value;
+
+                    // Step through the objects in the selection set
+                    foreach (SelectedObject acSSObj in acSSet)
+                    {
+                        // Open the selected object for read
+                        Entity acEnt = acTrans.GetObject(acSSObj.ObjectId,
+                                                         OpenMode.ForRead) as Entity;
+
+                        // Get the extended data attached to each object for MY_APP
+                        ResultBuffer rb = acEnt.GetXDataForApplication(appName);
+
+                        // Make sure the Xdata is not empty
+                        if (rb != null)
+                        {
+                            // Get the values in the xdata
+                            foreach (TypedValue typeVal in rb)
+                            {
+                                msgstr = msgstr + "\n" + typeVal.TypeCode.ToString() + " : " + typeVal.Value;
+                            }
+                        }
+                        else
+                        {
+                            msgstr = "NONE";
+                        }
+
+                        // Display the values returned
+                        Application.ShowAlertDialog(appName + " xdata on " + acEnt.GetType().ToString() + ":\n" + msgstr);
+
+                        msgstr = "";
+                    }
+                }
+
+                // Ends the transaction and ensures any changes made are ignored
+                acTrans.Abort();
+
+                // Dispose of the transaction
+            }
+        }
+
         [CommandMethod("GetReport")]
         public void GetReport()
         {
@@ -104,8 +176,18 @@ namespace test00
             acCurDb = Application.DocumentManager.MdiActiveDocument.Database;
 
             Document acDoc = Application.DocumentManager.MdiActiveDocument;
+            Editor edt = acDoc.Editor;
 
-            string appName = "AutoPost2004";
+            // Prompt the user using PromptStringOptions
+            PromptStringOptions prompt = new PromptStringOptions("Enter AppName : ");
+            prompt.AllowSpaces = true;
+
+            // Get the results of the user input using a PromptResult
+            PromptResult promptResult = edt.GetString(prompt);
+
+            //string appName = "AutoPost2004";
+            string appName = promptResult.StringResult;
+            //string appName = "AutoPost2004";
 
             string msgstr = "";
 
@@ -141,20 +223,20 @@ namespace test00
                             var tendon = 0;
                             var tendonSubId = 0;
 
-                            if (tv[1].TypeCode == 1070 && tv[1].Value.ToString() == "102")
+                            if (tv[1].TypeCode == 1070 && (tv[1].Value.ToString() == "102" || tv[1].Value.ToString() == "12"))
                             {
                                 ClearDB();
                                 CloseDatabase();
                                 Application.ShowAlertDialog("Can't create report.\nThere is level 2 Tendon selected.");
                                 return;
                             }
-                            else if (tv[1].TypeCode == 1070 && tv[1].Value.ToString() == "103")
+                            else if (tv[1].TypeCode == 1070 && (tv[1].Value.ToString() == "103" || tv[1].Value.ToString() == "13"))
                             {
                                 tendon = 3;
                                 tendon3num++;
                                 tendonSubId = tendon3num;
                             }
-                            else if (tv[1].TypeCode == 1070 && tv[1].Value.ToString() == "104")
+                            else if (tv[1].TypeCode == 1070 && (tv[1].Value.ToString() == "104" || tv[1].Value.ToString() == "14"))
                             {
                                 tendon = 4;
                                 tendon4num++;
@@ -185,8 +267,17 @@ namespace test00
 
                         msgstr = "";
                     }
+
                     CloseDatabase();
-                    form();
+
+                    if(tendon3num!=0 && tendon4num!=0)
+                    {
+                        form();
+                    }
+                    else
+                    {
+                        Application.ShowAlertDialog("No tendon level 3 or 4 found.");
+                    }
                 }
 
                 // Ends the transaction and ensures any changes made are ignored
@@ -358,9 +449,17 @@ namespace test00
             acCurDb = Application.DocumentManager.MdiActiveDocument.Database;
 
             Document acDoc = Application.DocumentManager.MdiActiveDocument;
+            Editor edt = acDoc.Editor;
 
-            string appName = "AutoPost2004";
+            // Prompt the user using PromptStringOptions
+            PromptStringOptions prompt = new PromptStringOptions("Enter AppName : ");
+            prompt.AllowSpaces = true;
 
+            // Get the results of the user input using a PromptResult
+            PromptResult promptResult = edt.GetString(prompt);
+
+            //string appName = "AutoPost2004";
+            string appName = promptResult.StringResult;
             string msgstr = "";
 
             using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
@@ -400,7 +499,7 @@ namespace test00
                             TypedValue[] tv = rb.AsArray();
                             try
                             {
-                                msgstr = msgstr + "\n" + tv[order.Value].TypeCode.ToString() + " : " + tv[order.Value].Value;
+                                msgstr = msgstr + "\n" + tv[order.Value-1].TypeCode.ToString() + " : " + tv[order.Value-1].Value;
 
                             }
                             catch
@@ -441,9 +540,159 @@ namespace test00
             f.Show();
         }
 
-        public static String conn_string = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=D:\\KMUTT\\GstarCADTest\\XdataTest.accdb;Persist Security Info= False";
+        // Copy xData to new AppName
+        [CommandMethod("CopyXdata")]
+        public void CopyXdata()
+        {
+            // Get the current database and start a transaction
+            Database acCurDb;
+            acCurDb = Application.DocumentManager.MdiActiveDocument.Database;
+            Document acDoc = Application.DocumentManager.MdiActiveDocument;
+            Editor edt = acDoc.Editor;
+
+            // Prompt the user using PromptStringOptions
+            PromptStringOptions prompt = new PromptStringOptions("Enter Old AppName : ");
+            prompt.AllowSpaces = true;
+
+            // Get the results of the user input using a PromptResult
+            PromptResult promptResult = edt.GetString(prompt);
+
+            // Prompt the user using PromptStringOptions
+            PromptStringOptions prompt2 = new PromptStringOptions("Enter New AppName : ");
+            prompt2.AllowSpaces = true;
+
+            // Get the results of the user input using a PromptResult
+            PromptResult promptResult2 = edt.GetString(prompt2);
+
+
+            string appName = promptResult.StringResult;
+            string newAppName = promptResult2.StringResult;
+
+            string msgstr = "";
+
+            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+            {
+                // Request objects to be selected in the drawing area
+                PromptSelectionResult acSSPrompt = acDoc.Editor.GetSelection();
+
+                // If the prompt status is OK, objects were selected
+                if (acSSPrompt.Status == PromptStatus.OK)
+                {
+                    SelectionSet acSSet = acSSPrompt.Value;
+
+                    // Step through the objects in the selection set
+                    foreach (SelectedObject acSSObj in acSSet)
+                    {
+                        // Open the selected object for read
+                        Entity acEnt = acTrans.GetObject(acSSObj.ObjectId,
+                                                         OpenMode.ForWrite) as Entity;
+
+                        // Get the extended data attached to each object for MY_APP
+                        ResultBuffer rb = acEnt.GetXDataForApplication(appName);
+
+                        // Make sure the Xdata is not empty
+                        if (rb != null)
+                        {
+                            try
+                            {
+                                // Change data into array
+                                TypedValue[] tv = rb.AsArray();
+
+                                // Change AppName to new name that store in first array 
+                                tv[0] = new TypedValue((int)DxfCode.ExtendedDataRegAppName, newAppName);
+
+                                // Chage value of tendon to 2022 style
+                                if (tv[1].TypeCode == 1070)
+                                {
+                                    tv[1] = ChangeValue2022(tv[1]);
+                                }
+
+
+
+
+                                // Create result Buffer to add data to Xdata
+                                using (ResultBuffer rb2 = new ResultBuffer())
+                                {
+                                    // Get the values in the xdata
+
+                                    // Each TypedValue called "tvs" in array "tv"
+                                    foreach (TypedValue tvs in tv)
+                                    {
+                                        rb2.Add(tvs);
+                                    }
+                                    acEnt.XData = rb2;
+                                }
+
+                            }
+                            catch (System.Exception ex)
+                            {
+                                Application.ShowAlertDialog(ex.Message);
+                                return;
+                            }
+                           
+
+                        }
+
+                        msgstr = "";
+                    }
+                }
+
+                // Send the transaction
+                acTrans.Commit();
+
+                acDoc.Editor.WriteMessage("\nFinish copy xdata from " + appName + " to " + newAppName);
+            }
+        }
+
+        TypedValue ChangeValue2022(TypedValue tv)
+        {
+            switch (tv.Value.ToString())
+            {
+                case "206":
+                    return new TypedValue((int)DxfCode.ExtendedDataInteger16, "11");
+
+                case "102":
+                    return new TypedValue((int)DxfCode.ExtendedDataInteger16, "12");
+
+                case "103":
+                    return new TypedValue((int)DxfCode.ExtendedDataInteger16, "13");
+
+                case "104":
+                    return new TypedValue((int)DxfCode.ExtendedDataInteger16, "14")
+                        ;
+                case "201":
+                    return new TypedValue((int)DxfCode.ExtendedDataInteger16, "21");
+
+                case "202":
+                    return new TypedValue((int)DxfCode.ExtendedDataInteger16, "22");
+
+                case "203":
+                    return new TypedValue((int)DxfCode.ExtendedDataInteger16, "23");
+
+                case "204":
+                    return new TypedValue((int)DxfCode.ExtendedDataInteger16, "24");
+
+                case "205":
+                    return new TypedValue((int)DxfCode.ExtendedDataInteger16, "25");
+
+                default:
+                    return tv;
+            }
+        }
+
+
+
+        /*=================================================
+
+                        DATABASE CODING SECTION
+
+        =================================================== */
+
+
+        // Declared connection variable for database section
         OleDbConnection conn = null;
 
+        // Connect to Aceess DB (Database)
         public void ConnectDatabase()
         {
             try
@@ -457,6 +706,7 @@ namespace test00
             }
         }
 
+        // Disconnect
         public void CloseDatabase()
         {
             try
@@ -466,6 +716,7 @@ namespace test00
             catch (System.Exception ex) { Application.ShowAlertDialog(ex.Message); }
         }
 
+        // Push data to DB
         public void AddDataToDatabase(int tendon,int tendonSubId,string typecode, string values)
         {
             string q = "INSERT INTO XDATA_TEST VALUES ('" + tendon + "','" + tendonSubId + "','" + typecode + "','" + values + "')";
@@ -482,6 +733,7 @@ namespace test00
             }
         }
 
+        // Clear data from DB
         public void ClearDB()
         {
             string q = "DELETE * FROM XDATA_TEST";
